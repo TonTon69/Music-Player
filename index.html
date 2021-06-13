@@ -72,23 +72,206 @@
       </div>
 
       <!-- Playlist -->
-      <div class="playlist">
-        <div class="song">
-          <div
-            class="thumb"
-            style="
-              background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg');
-            "
-          ></div>
-          <div class="body">
-            <h3 class="title">Music name</h3>
-            <p class="author">Singer</p>
-          </div>
-          <div class="option">
-            <i class="fas fa-ellipsis-h"></i>
-          </div>
-        </div>
-      </div>
+      <div class="playlist"></div>
     </div>
+    <script>
+      // 1. Render songs
+      // 2. Scroll Top
+      // 3. Play / pause / seek
+      // 4. CD rotate
+      // 5. Next / prev
+      // 6. Random
+      // 7. Next / Repeat when ended
+      // 8. Active song
+      // 9. Scroll active song into view
+      // 10. Play song when click
+      const $ = document.querySelector.bind(document);
+      const $$ = document.querySelectorAll.bind(document);
+      const player = $(".player");
+      const cd = $(".cd");
+      const heading = $("header h2");
+      const cdThumb = $(".cd-thumb");
+      const audio = $("#audio");
+      const progress = $("#progress");
+      const playBtn = $(".btn-toggle-play");
+      const app = {
+        currentIndex: 0,
+        isPlaying: false,
+        songs: [
+          {
+            name: "Demons",
+            singer: "Imagine Dragons",
+            path: "./assets/music/Demons-Boyce-Avenue-Jennel-Garcia.mp3",
+            image: "./assets/img/Demons.jpg",
+          },
+          {
+            name: "I Hate U, I Love U",
+            singer: "Gnash Olivia",
+            path: "./assets/music/I-Hate-U-I-Love-U-Gnash-Olivia-O-brien.mp3",
+            image: "./assets/img/ihatu_iloveu.jpg",
+          },
+          {
+            name: "Summertime",
+            singer: "K-391",
+            path: "./assets/music/K-391-Summertime-Sunshine-K391.mp3",
+            image: "./assets/img/k931.jpg",
+          },
+          {
+            name: "The Fat Rat",
+            singer: "Monody",
+            path: "./assets/music/Monody-TheFatRat-feat-Laura-Brehm.mp3",
+            image: "./assets/img/monsters.jpg",
+          },
+          {
+            name: "My Love",
+            singer: "Westlife",
+            path: "./assets/music/My-Love-Westlife.mp3",
+            image: "./assets/img/mylove.jpg",
+          },
+          {
+            name: "Reality",
+            singer: "Lost Frequencies",
+            path: "./assets/music/Reality-Feat-Janieck-Devy-Lost-Frequencies.mp3",
+            image: "./assets/img/reality.jpg",
+          },
+          {
+            name: "See You Again",
+            singer: "Wiz Khalifa, Charlie Puth",
+            path: "./assets/music/See-You-Again-Absence-Remix-Wiz-Khalifa-Charlie-Puth.mp3",
+            image: "./assets/img/seeyouagain.png",
+          },
+          {
+            name: "Something Just Like This",
+            singer: "The Chainsmokers",
+            path: "./assets/music/Something-Just-Like-This-SlimV-Remix-Coldplay-The-Chainsmokers.mp3",
+            image: "./assets/img/something-just-like-this-slimev.jpg",
+          },
+          {
+            name: "Symphony",
+            singer: "Zara Larsson",
+            path: "./assets/music/Symphony-Alternative-Version-Clean-Bandit-Zara-Larsson.mp3",
+            image:
+              "./assets/img/Symphony-Alternative-Version-Clean-Bandit-Zara-Larsson.jpg",
+          },
+          {
+            name: "That Girl",
+            singer: "Olly Murs",
+            path: "./assets/music/THAT-GIRL-Olly-Murs-Cover-Nabee.mp3",
+            image: "./assets/img/thatgirl.jpg",
+          },
+          {
+            name: "Try",
+            singer: "Pink",
+            path: "./assets/music/Try-Pink.mp3",
+            image: "./assets/img/trypink.jpg",
+          },
+        ],
+        render: function () {
+          const htmls = this.songs.map((song) => {
+            return `<div class="song">
+                      <div
+                        class="thumb"
+                        style="
+                          background-image: url('${song.image}');
+                        "
+                      ></div>
+                      <div class="body">
+                        <h3 class="title">${song.name}</h3>
+                        <p class="author">${song.singer}</p>
+                      </div>
+                      <div class="option">
+                        <i class="fas fa-ellipsis-h"></i>
+                      </div>
+                    </div>`;
+          });
+          $(".playlist").innerHTML = htmls.join("");
+        },
+        defineProperties: function () {
+          Object.defineProperty(this, "currentSong", {
+            get: function () {
+              return this.songs[this.currentIndex];
+            },
+          });
+        },
+        handleEvents: function () {
+          const _this = this;
+          const cdWidth = cd.offsetWidth; //lấy thuộc tính width của cd
+
+          // xử lý cd quay / dừng
+          const cdThumbAnimate = cdThumb.animate(
+            [
+              {
+                transform: "rotate(360deg)",
+              },
+            ],
+            {
+              duration: 10000, //10 seconds
+              iterations: Infinity, //vô hạn
+            }
+          );
+          cdThumbAnimate.pause();
+          // xử lý phóng to / thu nhỏ CD
+          document.onscroll = function () {
+            const scrollTop =
+              window.scrollY || document.documentElement.scrollTop;
+            const newCdWidth = cdWidth - scrollTop;
+            cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0; //set > 0
+            cd.style.opacity = newCdWidth / cdWidth; //mờ dần
+          };
+          // xử lý khi click player
+          playBtn.onclick = function () {
+            if (_this.isPlaying) {
+              audio.pause();
+              player.classList.remove("playing");
+            } else {
+              audio.play();
+            }
+          };
+          // khi song được play
+          audio.onplay = function () {
+            _this.isPlaying = true;
+            player.classList.add("playing");
+            cdThumbAnimate.play();
+          };
+          // khi song bị pause
+          audio.onpause = function () {
+            _this.isPlaying = false;
+            player.classList.remove("playing");
+            cdThumbAnimate.pause();
+          };
+          // khi tiến độ bài hát thay đổi
+          audio.ontimeupdate = function () {
+            if (audio.duration) {
+              const progressPercent = Math.floor(
+                (audio.currentTime / audio.duration) * 100
+              );
+              progress.value = progressPercent;
+            }
+          };
+          // xử lý khi tua song
+          progress.onchange = function (e) {
+            const seekTime = (audio.duration / 100) * e.target.value;
+            audio.currentTime = seekTime;
+          };
+        },
+        loadCurrentSong: function () {
+          heading.textContent = this.currentSong.name;
+          cdThumb.style.backgroundImage = `url(${this.currentSong.image})`;
+          audio.src = this.currentSong.path;
+        },
+
+        start: function () {
+          // định nghĩa các thuộc tính cho object
+          this.defineProperties();
+          // lắng nghe và xử lý các sự kiện (DOM events)
+          this.handleEvents();
+          // tải thông tin bài hát đầu tiên vào UI khi chạy ứng dụng
+          this.loadCurrentSong();
+          // render playlist
+          this.render();
+        },
+      };
+      app.start();
+    </script>
   </body>
 </html>
