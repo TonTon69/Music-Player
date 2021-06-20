@@ -80,10 +80,16 @@ header h2 {
 
 /* Volume */
 .volume {
+    margin-top: 20px;
+    text-align: center;
+}
+.volume-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 20px;
+}
+#volume-show {
+    font-size: 14px;
 }
 .volume input {
     width: 50%;
@@ -157,10 +163,16 @@ header h2 {
     background-color: var(--primary-color);
     cursor: pointer;
 }
-
+.current-time,
+.duration-time {
+    font-size: 14px;
+}
+.duration-time {
+    float: right;
+}
 /* PLAYLIST */
 .playlist {
-    margin-top: 440px;
+    margin-top: 480px;
     padding: 12px;
 }
 

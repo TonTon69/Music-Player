@@ -40,15 +40,18 @@
 
                 <!-- Volume -->
                 <div class="volume">
-                    <i class="fas fa-volume-up" id="volume-icon"></i>
-                    <input
-                        id="volume"
-                        type="range"
-                        min="0"
-                        max="100"
-                        value="90"
-                    />
-                    <p id="volume-show">90</p>
+                    <p id="volume-show">Volume: 90%</p>
+                    <div class="volume-control">
+                        <i class="fas fa-minus"></i>
+                        <input
+                            id="volume"
+                            type="range"
+                            min="0"
+                            max="100"
+                            value="90"
+                        />
+                        <i class="fas fa-plus"></i>
+                    </div>
                 </div>
                 <!-- Control -->
                 <div class="control">
@@ -69,17 +72,19 @@
                         <i class="fas fa-random"></i>
                     </div>
                 </div>
-
-                <input
-                    id="progress"
-                    class="progress"
-                    type="range"
-                    value="0"
-                    step="1"
-                    min="0"
-                    max="100"
-                />
-
+                <div class="bar">
+                    <span class="current-time">00:00</span>
+                    <span class="duration-time">02:54</span>
+                    <input
+                        id="progress"
+                        class="progress"
+                        type="range"
+                        value="0"
+                        step="1"
+                        min="0"
+                        max="100"
+                    />
+                </div>
                 <audio id="audio" src=""></audio>
             </div>
 
@@ -201,20 +206,20 @@
                         return `<div data-index="${index}" class="song ${
                             index === this.currentIndex ? "active" : ""
                         }">
-                      <div
-                        class="thumb"
-                        style="
-                          background-image: url('${song.image}');
-                        "
-                      ></div>
-                      <div class="body">
-                        <h3 class="title">${song.name}</h3>
-                        <p class="author">${song.singer}</p>
-                      </div>
-                      <div class="option">
-                        <i class="fas fa-ellipsis-h"></i>
-                      </div>
-                    </div>`;
+                                  <div
+                                    class="thumb"
+                                    style="
+                                      background-image: url('${song.image}');
+                                    "
+                                  ></div>
+                                  <div class="body">
+                                    <h3 class="title">${song.name}</h3>
+                                    <p class="author">${song.singer}</p>
+                                  </div>
+                                  <div class="option">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                  </div>
+                                </div>`;
                     });
                     playList.innerHTML = htmls.join("");
                 },
@@ -279,6 +284,12 @@
                                 (audio.currentTime / audio.duration) * 100
                             );
                             progress.value = progressPercent;
+                            $(".current-time").textContent = _this.formatTime(
+                                audio.currentTime
+                            );
+                            $(".duration-time").textContent = _this.formatTime(
+                                audio.duration
+                            );
                         }
                     };
                     // xử lý khi tua song
@@ -349,14 +360,9 @@
                     };
                     // Thay đổi âm lượng
                     $("#volume").onchange = function () {
-                        $("#volume-show").innerHTML = $("#volume").value;
+                        $("#volume-show").innerHTML =
+                            "Volume: " + $("#volume").value + "%";
                         audio.volume = $("#volume").value / 100;
-                    };
-                    // tắt tiếng
-                    $("#volume-icon").onclick = function () {
-                        audio.volume = 0;
-                        volume.value = 0;
-                        $("#volume-show").innerHTML = 0;
                     };
                 },
                 scrollToActiveSong: function () {
@@ -367,6 +373,7 @@
                         });
                     }, 300);
                 },
+
                 loadCurrentSong: function () {
                     heading.textContent = this.currentSong.name;
                     cdThumb.style.backgroundImage = `url(${this.currentSong.image})`;
@@ -401,6 +408,28 @@
                         this.currentIndex = this.songs.length - 1;
                     }
                     this.loadCurrentSong();
+                },
+                formatTime: function (sec_num) {
+                    let hours = Math.floor(sec_num / 3600);
+                    let minutes = Math.floor((sec_num - hours * 3600) / 60);
+                    let seconds = Math.floor(
+                        sec_num - hours * 3600 - minutes * 60
+                    );
+
+                    hours = hours < 10 ? (hours > 0 ? "0" + hours : 0) : hours;
+
+                    if (minutes < 10) {
+                        minutes = "0" + minutes;
+                    }
+                    if (seconds < 10) {
+                        seconds = "0" + seconds;
+                    }
+                    return (
+                        (hours !== 0 ? hours + ":" : "") +
+                        minutes +
+                        ":" +
+                        seconds
+                    );
                 },
                 start: function () {
                     // gán cấu hình từ config vào ứng dụng
